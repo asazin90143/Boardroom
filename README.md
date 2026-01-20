@@ -1,16 +1,67 @@
-# React + Vite
+# 📋 Digital Bulletin Board (Boardroom)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, real-time digital bulletin board built with React and Firebase. Create sticky notes, organize your thoughts, and keep track of changes in a collaborative environment.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Real-time Synchronization:** Changes appear instantly across all devices.
+- **Drag & Drop Interface:** Intuitive free-form canvas using `@dnd-kit`.
+- **Google Authentication:** Secure and easy login with Firebase Auth.
+- **Persistent Storage:** All boards and items are stored safely in Firestore.
+- **History Tracking:** View a log of all actions taken on the board.
+- **Customizable Notes:** Change note colors and edit content easily.
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend:** React, Vite
+- **Backend/Service:** Firebase (Authentication, Firestore)
+- **Styling:** Vanilla CSS (Glassmorphism design)
+- **Libraries:** `@dnd-kit/core` (Drag and Drop), `react-icons`
 
-## Expanding the ESLint configuration
+## 🚀 Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js (v16+)
+- npm or yarn
+- A Firebase Project (Proejct ID, Auth Domain, API Key)
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <repository_url>
+   cd "Digital Bulletin Board"
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment:**
+   Create a `.env.local` file in the root directory and add your Firebase credentials (see `docs/SETUP.md` for details):
+   ```env
+   VITE_FIREBASE_API_KEY=your_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   VITE_FIREBASE_APP_ID=your_app_id
+   ```
+
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+   The app will be available at `http://localhost:5173`.
+
+## 📚 Documentation
+
+- **[Setup Guide](docs/SETUP.md):** Detailed instructions on creating and configuring your Firebase project.
+- **[Design/PRD](docs/PRD_ANALYSIS.md):** Analysis of project requirements and features.
+
+## 📄 License
+
+This project is licensed under the MIT License.
