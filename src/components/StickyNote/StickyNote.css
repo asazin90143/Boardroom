@@ -1,6 +1,7 @@
 .sticky-note {
     position: absolute;
     width: 220px;
+    /* Default, overridden by inline style */
     min-height: 180px;
     padding: 0;
     border-radius: 4px;
@@ -14,6 +15,11 @@
     flex-direction: column;
     font-family: 'Segoe UI', system-ui, sans-serif;
     user-select: none;
+
+    /* Enable resizing */
+    resize: both;
+    overflow: hidden;
+    /* Required for resize handle */
 }
 
 .sticky-note::before {
@@ -26,6 +32,7 @@
     height: 20px;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
     border-radius: 0 0 50% 50%;
+    pointer-events: none;
 }
 
 .sticky-note:hover {
@@ -41,6 +48,7 @@
         0 25px 50px -12px rgba(0, 0, 0, 0.25),
         0 10px 20px rgba(0, 0, 0, 0.2);
     transform: rotate(3deg) scale(1.05);
+    z-index: 9999;
 }
 
 .sticky-note.editing {
@@ -51,10 +59,12 @@
 .note-header {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 4px;
     padding: 8px 8px 0;
     opacity: 0;
     transition: opacity 0.2s ease;
+    z-index: 10;
 }
 
 .sticky-note:hover .note-header {
@@ -116,7 +126,7 @@
 .note-content {
     flex: 1;
     padding: 12px 16px;
-    font-size: 0.95rem;
+    /* Font size is handled by inline style now */
     line-height: 1.5;
     color: rgba(0, 0, 0, 0.8);
     white-space: pre-wrap;
@@ -132,7 +142,7 @@
     border-radius: 6px;
     background: rgba(255, 255, 255, 0.5);
     font-family: inherit;
-    font-size: 0.95rem;
+    /* Font size handled inline */
     line-height: 1.5;
     color: rgba(0, 0, 0, 0.9);
     resize: none;
@@ -149,6 +159,9 @@
     padding: 8px 12px;
     opacity: 0;
     transition: opacity 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .sticky-note:hover .note-footer {
@@ -158,4 +171,45 @@
 .note-hint {
     font-size: 0.7rem;
     color: rgba(0, 0, 0, 0.4);
+}
+
+/* Image Note Styles */
+.note-image-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    padding: 8px;
+}
+
+.note-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+    pointer-events: none;
+    /* Allows click-through for dnd */
+}
+
+/* Size controls */
+.size-controls {
+    display: flex;
+    gap: 4px;
+    margin-right: auto;
+    /* Push to left */
+}
+
+.size-btn {
+    padding: 2px 6px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    cursor: pointer;
+}
+
+.size-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
 }
