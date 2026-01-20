@@ -64,15 +64,45 @@ const StickyNote = ({ item }) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleResizeEnd = () => {
-        if (noteRef.current) {
-            const w = noteRef.current.style.width;
-            const h = noteRef.current.style.height;
-            // Only update if styles were explicitly set by resize handle (non-empty)
-            if (w && h) {
-                updateItem(item.id, { width: w, height: h });
+    // Custom Resize Handler
+    const handleResizeMouseDown = (e) => {
+        e.stopPropagation(); // Stop drag propagation
+
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const startWidth = noteRef.current.offsetWidth;
+        const startHeight = noteRef.current.offsetHeight;
+
+        const onMouseMove = (moveEvent) => {
+            moveEvent.preventDefault();
+            const deltaX = moveEvent.clientX - startX;
+            const deltaY = moveEvent.clientY - startY;
+
+            // Enforce minimum dimensions
+            const newWidth = Math.max(180, startWidth + deltaX);
+            const newHeight = Math.max(140, startHeight + deltaY);
+
+            if (noteRef.current) {
+                noteRef.current.style.width = `${newWidth}px`;
+                noteRef.current.style.height = `${newHeight}px`;
             }
-        }
+        };
+
+        const onMouseUp = () => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+
+            // Save the new size to Firestore
+            if (noteRef.current) {
+                updateItem(item.id, {
+                    width: noteRef.current.style.width,
+                    height: noteRef.current.style.height
+                });
+            }
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
     };
 
     const handleFontSizeChange = (delta) => {
@@ -122,7 +152,6 @@ const StickyNote = ({ item }) => {
             className={`sticky-note ${isDragging ? 'dragging' : ''} ${isEditing ? 'editing' : ''}`}
             style={style}
             onDoubleClick={handleDoubleClick}
-            onMouseUp={handleResizeEnd}
             {...(!isEditing ? { ...listeners, ...attributes } : {})}
         >
             <div className={`note-header ${isImage ? 'image-header' : ''}`}>
@@ -160,7 +189,6 @@ const StickyNote = ({ item }) => {
                     </button>
                 )}
 
-                {/* For images, we can add a delete button clearly visible */}
                 <div style={{ flex: 1 }}></div>
 
                 <button
@@ -214,9 +242,17 @@ const StickyNote = ({ item }) => {
                 )
             )}
 
+            {/* Custom Resize Handle */}
+            <div
+                className="resize-handle"
+                onMouseDown={handleResizeMouseDown}
+                onPointerDown={(e) => e.stopPropagation()}
+                title="Drag to resize"
+            />
+
             {!isImage && (
                 <div className="note-footer">
-                    <span className="note-hint">Drag • Edit • Resize</span>
+                    <span className="note-hint">Drag • Edit • Resize ↘</span>
                 </div>
             )}
         </div>
