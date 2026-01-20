@@ -30,8 +30,8 @@ export const BoardProvider = ({ children }) => {
     const [historyLogs, setHistoryLogs] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // Default board ID (for MVP, we use a single board per user)
-    const boardId = user ? `board_${user.uid}` : null;
+    // Shared Board ID (Everyone sees the same board)
+    const boardId = 'global-shared-board';
 
     // Subscribe to items changes
     useEffect(() => {
