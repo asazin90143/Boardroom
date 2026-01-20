@@ -101,7 +101,7 @@ export const BoardProvider = ({ children }) => {
     }, [boardId, user]);
 
     // Create item
-    const createItem = useCallback(async (type, content, positionX, positionY, color = '#fef08a') => {
+    const createItem = useCallback(async (type, content, positionX, positionY, color = '#fef08a', options = {}) => {
         if (!boardId || !user) return;
 
         try {
@@ -112,6 +112,9 @@ export const BoardProvider = ({ children }) => {
                 positionX,
                 positionY,
                 color,
+                width: options.width || (type === 'image' ? 'auto' : 220),
+                height: options.height || (type === 'image' ? 'auto' : 180),
+                fontSize: options.fontSize || 16,
                 createdBy: user.uid,
                 lastModified: serverTimestamp()
             };
@@ -126,58 +129,39 @@ export const BoardProvider = ({ children }) => {
         }
     }, [boardId, user, addHistoryLog]);
 
-    // Update item position
-    const updateItemPosition = useCallback(async (itemId, positionX, positionY) => {
+    // Generic Update Item
+    const updateItem = useCallback(async (itemId, updates) => {
         if (!boardId || !user) return;
 
         try {
             const itemRef = doc(db, 'boards', boardId, 'items', itemId);
             await updateDoc(itemRef, {
-                positionX,
-                positionY,
-                lastModified: serverTimestamp()
-            });
-
-            await addHistoryLog('MOVE', `Moved item to (${Math.round(positionX)}, ${Math.round(positionY)})`);
-        } catch (error) {
-            console.error('Error updating item position:', error);
-            throw error;
-        }
-    }, [boardId, user, addHistoryLog]);
-
-    // Update item content
-    const updateItemContent = useCallback(async (itemId, content) => {
-        if (!boardId || !user) return;
-
-        try {
-            const itemRef = doc(db, 'boards', boardId, 'items', itemId);
-            await updateDoc(itemRef, {
-                content,
-                lastModified: serverTimestamp()
-            });
-
-            await addHistoryLog('EDIT', `Edited: "${content.substring(0, 30)}..."`);
-        } catch (error) {
-            console.error('Error updating item content:', error);
-            throw error;
-        }
-    }, [boardId, user, addHistoryLog]);
-
-    // Update item color
-    const updateItemColor = useCallback(async (itemId, color) => {
-        if (!boardId || !user) return;
-
-        try {
-            const itemRef = doc(db, 'boards', boardId, 'items', itemId);
-            await updateDoc(itemRef, {
-                color,
+                ...updates,
                 lastModified: serverTimestamp()
             });
         } catch (error) {
-            console.error('Error updating item color:', error);
+            console.error('Error updating item:', error);
             throw error;
         }
     }, [boardId, user]);
+
+    // Update item position
+    const updateItemPosition = useCallback(async (itemId, positionX, positionY) => {
+        // ... reusing generic update could be better but keeping legacy for stability
+        updateItem(itemId, { positionX, positionY });
+        await addHistoryLog('MOVE', `Moved item to (${Math.round(positionX)}, ${Math.round(positionY)})`);
+    }, [updateItem, addHistoryLog]);
+
+    // Update item content
+    const updateItemContent = useCallback(async (itemId, content) => {
+        updateItem(itemId, { content });
+        await addHistoryLog('EDIT', `Edited: "${content.substring(0, 30)}..."`);
+    }, [updateItem, addHistoryLog]);
+
+    // Update item color
+    const updateItemColor = useCallback(async (itemId, color) => {
+        updateItem(itemId, { color });
+    }, [updateItem]);
 
     // Delete item
     const deleteItem = useCallback(async (itemId, itemSummary) => {
@@ -200,6 +184,7 @@ export const BoardProvider = ({ children }) => {
         historyLogs,
         loading,
         createItem,
+        updateItem,
         updateItemPosition,
         updateItemContent,
         updateItemColor,
