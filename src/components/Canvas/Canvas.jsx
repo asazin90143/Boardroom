@@ -70,6 +70,20 @@ const Canvas = () => {
         );
     };
 
+    const handleAddImage = async (content) => {
+        const canvasRect = canvasRef.current?.getBoundingClientRect();
+        const centerX = canvasRect ? (canvasRect.width / 2) - 150 : 200;
+        const centerY = canvasRect ? (canvasRect.height / 2) - 100 : 200;
+
+        await createItem(
+            'image',
+            content,
+            centerX + (Math.random() * 50 - 25),
+            centerY + (Math.random() * 50 - 25),
+            'transparent'
+        );
+    };
+
     const activeItem = activeId ? items.find(i => i.id === activeId) : null;
 
     return (
@@ -106,25 +120,40 @@ const Canvas = () => {
                     )}
 
                     {items.map((item) => (
-                        item.type === 'text' && (
-                            <StickyNote key={item.id} item={item} />
-                        )
+                        <StickyNote key={item.id} item={item} />
                     ))}
 
                     <DragOverlay>
                         {activeItem ? (
                             <div
                                 className="drag-overlay-note"
-                                style={{ backgroundColor: activeItem.color || '#fef08a' }}
+                                style={{
+                                    backgroundColor: activeItem.color || '#fef08a',
+                                    width: activeItem.width || (activeItem.type === 'image' ? '300px' : '220px'),
+                                    height: activeItem.height || (activeItem.type === 'image' ? 'auto' : '180px'),
+                                    display: 'flex',
+                                    padding: activeItem.type === 'image' ? '8px' : '12px',
+                                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+                                }}
                             >
-                                {activeItem.content}
+                                {activeItem.type === 'image' ? (
+                                    <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+                                        <img src={activeItem.content} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', pointerEvents: 'none' }} alt="drag preview" />
+                                    </div>
+                                ) : (
+                                    activeItem.content
+                                )}
                             </div>
                         ) : null}
                     </DragOverlay>
                 </div>
             </DndContext>
 
-            <Toolbar onAddNote={handleAddNote} onToggleHistory={() => setShowHistory(!showHistory)} />
+            <Toolbar
+                onAddNote={handleAddNote}
+                onAddImage={handleAddImage}
+                onToggleHistory={() => setShowHistory(!showHistory)}
+            />
 
             <HistoryLog isOpen={showHistory} onClose={() => setShowHistory(false)} />
         </div>

@@ -102,7 +102,14 @@ export const BoardProvider = ({ children }) => {
 
     // Create item
     const createItem = useCallback(async (type, content, positionX, positionY, color = '#fef08a', options = {}) => {
-        if (!boardId || !user) return;
+        if (!user) {
+            alert("Error: You must be logged in to add items.");
+            return;
+        }
+        if (!boardId) {
+            alert("Error: Board ID missing. Please refresh the page.");
+            return;
+        }
 
         try {
             const itemsRef = collection(db, 'boards', boardId, 'items');
@@ -125,6 +132,11 @@ export const BoardProvider = ({ children }) => {
             return docRef.id;
         } catch (error) {
             console.error('Error creating item:', error);
+            if (error.code === 'permission-denied') {
+                alert("Permission Denied: Unable to save to Firestore. Please check your Firebase 'Rules' settings.");
+            } else {
+                alert(`Error creating item: ${error.message}`);
+            }
             throw error;
         }
     }, [boardId, user, addHistoryLog]);
